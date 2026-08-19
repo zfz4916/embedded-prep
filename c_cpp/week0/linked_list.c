@@ -25,9 +25,10 @@ void FreeList(struct Node* head) {
         free(temp);
         temp = next;
     }
-    if (head->next == NULL) {
-        return;
-    }
+    //head has already been freed, using it here again would be a dangling pointer.UB
+    // if (head->next == NULL) {
+    //     return;
+    // }
 }
 
 void PrintList(struct Node* head) {
