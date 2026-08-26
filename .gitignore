@@ -1,0 +1,5 @@
+stm32_demo/
+memory_layout
+*.o
+*.out
+*.exe
