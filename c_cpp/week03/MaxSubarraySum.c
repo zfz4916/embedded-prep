@@ -7,7 +7,7 @@ int MaxSubseqSum1 (int A[], int N) {
     int thissum,maxsum = 0;
     for (int i = 0; i < N; i++) {
     //i is the left number
-        for (j = i; j < N, j++) {
+        for (j = i; j < N; j++) {
         //j is the right number
             thissum = 0;
             for (k = i; k <= j; k++) {
@@ -26,6 +26,7 @@ int MaxSubseqSum2 (int A[], int N) {
     int thissum, maxsum = 0;
     for (int i = 0; i < N; i++) {
         for (j = i; j < N; j++) {
+            thissum = 0;
             thissum += A[j];
             if (thissum > maxsum) {
                 maxsum = thissum;
