@@ -106,48 +106,54 @@ void list_print(struct Node *head) {
 
 
 int main(void) {
-    struct Node *e = NULL;
-    printf("初始空表:        "); 
-    list_print(e); 
+    /* ---------- 建表：1 ~ 10 ---------- */
+    int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    struct Node *head = list_create(a, 10);
 
-    list_push_tail(&e, 7);
-    printf("push_tail(7):    "); 
-    list_print(e);
+    /* ---------- 头插 0 ---------- */
+    list_push_head(&head, 0);
+    printf("push_head(0):    "); list_print(head);
+    /* 期望: 0 1 2 3 4 5 6 7 8 9 10 */
 
-    list_push_head(&e, 8);
-    printf("push_head(8):    "); 
-    list_print(e);
+    /* ---------- 尾插 11 ---------- */
+    list_push_tail(&head, 11);
+    printf("push_tail(11):   "); list_print(head);
+    /* 期望: 0 1 2 3 4 5 6 7 8 9 10 11 */
 
-    list_free(&e);
-    printf("free 后头指针:   "); 
-    list_print(e);
+    /* ---------- 删除三分支 ---------- */
 
-    int a[] = {1, 2, 3, 4, 5};
-    struct Node *head = list_create(a, 5);
-    printf("链表:            "); 
-    list_print(head);
+    /* 分支 1：删头（0） */
+    list_delete(&head, 0);
+    printf("delete head(0):  "); list_print(head);
+    /* 期望: 1 2 3 4 5 6 7 8 9 10 11
+     * 验证 *head = cur->next 生效，head 从 0 变成 1 */
 
-    struct Node *hit = list_find(head, 3);
-    if (hit){
-        printf("find(3):         命中, val = %d\n", hit->val);
-    } else {
-        printf("find(3):         未命中 (nil)\n");
-    }
+    /* 分支 2：删中间（5） */
+    list_delete(&head, 5);
+    printf("delete mid(5):   "); list_print(head);
+    /* 期望: 1 2 3 4 6 7 8 9 10 11
+     * 验证 prev->next = cur->next 生效，4 直接接 6 */
 
-    struct Node *miss = list_find(head, 99);
-    if (miss) {
-        printf("find(99):        命中, val = %d\n", miss->val);
-    } else {
-        printf("find(99):        未命中 (nil)\n");
-    }
-    printf("删除前:          "); 
-    list_print(head);
+    /* 分支 3：删尾（11） */
+    list_delete(&head, 11);
+    printf("delete tail(11): "); list_print(head);
+    /* 期望: 1 2 3 4 6 7 8 9 10
+     * 验证尾节点被摘掉，前驱 10 的 next 置 NULL */
 
+    /* ---------- 删不存在的值：链表应原样不变 ---------- */
     list_delete(&head, 99);
+    printf("delete miss(99): "); list_print(head);
+    /* 期望: 1 2 3 4 6 7 8 9 10（逐字不变） */
 
-    printf("delete(99) 后:   ");
-    list_print(head);
+    /* ---------- 反转 ---------- */
+    head = list_reverse(head);
+    printf("reverse:         "); list_print(head);
+    /* 期望: 10 9 8 7 6 4 3 2 1 */
 
+    /* ---------- 释放 ---------- */
     list_free(&head);
+    printf("after free:      "); list_print(head);
+    /* 期望: (nil) */
+
     return 0;
 }
