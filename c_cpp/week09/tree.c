@@ -144,6 +144,16 @@ int main(void) {
     inorder(root);
     printf("\n");
 
+    delete(&root, 35);
+    printf("删除 35 后中序: ");
+    inorder(root);
+    printf("\n");
+
+    delete(&root, 60);
+    printf("删除 60 后中序: ");
+    inorder(root);
+    printf("\n");
+
     delete(&root, 50);
     printf("删除 50 后中序: ");
     inorder(root);
