@@ -112,146 +112,131 @@ struct Node *createFromArray(int a[], int n) {
 }
 
 int main(void) {
-    printf("===== 1. 创建：非法参数 =====\n");
+    printf("===== 1. 创建 + 三种遍历 =====\n");
     {
-        struct Heap *h0 = CreatHeap(0);
-        struct Heap *h1 = CreatHeap(-1);
-        assert(h0 == NULL);
-        assert(h1 == NULL);
-        printf("  size=0 / size<0 都返回 NULL ✅\n");
+        int a[] = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65};
+        int n = (int)(sizeof(a) / sizeof(a[0]));
+        struct Node *root = createFromArray(a, n);
+        assert(root != NULL);
+
+        printf("  前序: "); preorder(root);  printf("\n");
+        printf("  中序: "); inorder(root);   printf("\n");
+        printf("  后序: "); postorder(root); printf("\n");
+
+        freeTree(root);
     }
 
-    printf("\n===== 2. 创建：正常空堆 =====\n");
+    printf("\n===== 2. 查询：命中 / 未命中 =====\n");
     {
-        struct Heap *H = CreatHeap(8);
-        assert(H != NULL);
-        assert(H->size == 0);
-        assert(H->capacity == 8);
-        assert(H->data[0] == INT_MAX);
-        assert(IsEmptyHeap(H));
-        assert(!IsFullHeap(H));
-        FreeHeap(H);
-        printf("  空堆创建成功 ✅\n");
+        int a[] = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65};
+        int n = (int)(sizeof(a) / sizeof(a[0]));
+        struct Node *root = createFromArray(a, n);
+
+        struct Node *hit  = search(root, 40);
+        struct Node *miss = search(root, 99);
+        assert(hit  != NULL);
+        assert(hit->val == 40);
+        assert(miss == NULL);
+        printf("  search(40) 命中, search(99) 未命中 ✅\n");
+
+        freeTree(root);
     }
 
-    printf("\n===== 3. 空堆 Pop =====\n");
+    printf("\n===== 3. 插入 =====\n");
     {
-        struct Heap *H = CreatHeap(5);
-        int v = PopHeap(H);
-        assert(v == -1);
-        FreeHeap(H);
-        printf("  空堆 Pop 返回 -1 ✅\n");
+        int a[] = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65};
+        int n = (int)(sizeof(a) / sizeof(a[0]));
+        struct Node *root = createFromArray(a, n);
+
+        root = insert(root, 55);
+        root = insert(root, 10);
+
+        printf("  插入 55,10 后中序: ");
+        inorder(root);
+        printf("\n");
+
+        freeTree(root);
     }
 
-    printf("\n===== 4. 满堆：Push 被拒绝 =====\n");
+    printf("\n===== 4. 删除：叶子 / 单孩子 / 双孩子 =====\n");
     {
-        struct Heap *H = CreatHeap(2);
-        PushHeap(H, 5);
-        PushHeap(H, 3);
-        assert(IsFullHeap(H));
+        int a[] = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65, 55, 10};
+        int n = (int)(sizeof(a) / sizeof(a[0]));
+        struct Node *root = createFromArray(a, n);
 
-        PushHeap(H, 100);
-        assert(H->size == 2);
-        PrintHeap(H);
-        FreeHeap(H);
+        printf("  初始中序: "); inorder(root); printf("\n");
+
+        delete(&root, 35);
+        printf("  删 35 后: "); inorder(root); printf("\n");
+
+        delete(&root, 60);
+        printf("  删 60 后: "); inorder(root); printf("\n");
+
+        delete(&root, 30);
+        printf("  删 30 后: "); inorder(root); printf("\n");
+
+        freeTree(root);
     }
 
-    printf("\n===== 5. Push：向上调整 =====\n");
+    printf("\n===== 5. 删除根节点 =====\n");
     {
-        struct Heap *H = CreatHeap(10);
-        PushHeap(H, 1);
-        PushHeap(H, 2);
-        PushHeap(H, 3);
-        PushHeap(H, 10);
-        assert(H->data[1] == 10);
-        PrintHeap(H);
+        int a[] = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65, 55, 10};
+        int n = (int)(sizeof(a) / sizeof(a[0]));
+        struct Node *root = createFromArray(a, n);
 
-        PushHeap(H, 0);
-        PrintHeap(H);
-        FreeHeap(H);
+        delete(&root, 50);
+        printf("  删 50 后中序: "); inorder(root); printf("\n");
+
+        freeTree(root);
     }
 
-    printf("\n===== 6. Pop：向下调整 =====\n");
+    printf("\n===== 6. 删除 20，期望 10 40 45 55 65 70 80 =====\n");
     {
-        int a[] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
-        int n = 9;
-        struct Heap *H = CreatHeap(n);
-        for (int i = 0; i < n; i++) PushHeap(H, a[i]);
-        PrintHeap(H);
+        int a[] = {55, 40, 70, 10, 45, 65, 80, 20};
+        int n = (int)(sizeof(a) / sizeof(a[0]));
+        struct Node *root = createFromArray(a, n);
 
-        int prev = INT_MAX;
-        while (!IsEmptyHeap(H)) {
-            int v = PopHeap(H);
-            assert(v <= prev);
-            printf("  pop = %d\n", v);
-            prev = v;
+        printf("  初始中序: "); inorder(root); printf("\n");
+
+        delete(&root, 20);
+        printf("  删 20 后: "); inorder(root); printf("\n");
+
+        int expected[] = {10, 40, 45, 55, 65, 70, 80};
+        int exp_n = (int)(sizeof(expected) / sizeof(expected[0]));
+
+        int got[16];
+        int got_n = 0;
+        struct Node *stack[16];
+        int top = 0;
+        struct Node *cur = root;
+        while (cur || top > 0) {
+            while (cur) { stack[top++] = cur; cur = cur->left; }
+            cur = stack[--top];
+            got[got_n++] = cur->val;
+            cur = cur->right;
         }
-        assert(IsEmptyHeap(H));
-        FreeHeap(H);
-    }
 
-    printf("\n===== 7. 单元素堆 =====\n");
-    {
-        struct Heap *H = CreatHeap(1);
-        PushHeap(H, 42);
-        assert(IsFullHeap(H));
-
-        int v = PopHeap(H);
-        assert(v == 42);
-        assert(IsEmptyHeap(H));
-        FreeHeap(H);
-    }
-
-    printf("\n===== 8. 全相同元素 =====\n");
-    {
-        struct Heap *H = CreatHeap(4);
-        for (int i = 0; i < 4; i++) PushHeap(H, 5);
-        for (int i = 0; i < 4; i++) {
-            int v = PopHeap(H);
-            assert(v == 5);
+        assert(got_n == exp_n);
+        for (int i = 0; i < exp_n; i++) {
+            assert(got[i] == expected[i]);
         }
-        FreeHeap(H);
+        printf("  期望序列完全匹配 ✅\n");
+
+        freeTree(root);
     }
 
-    printf("\n===== 9. 降序输入 =====\n");
+    printf("\n===== 7. solo 单节点：newNode(7) → delete → NULL =====\n");
     {
-        int a[] = {100, 90, 80, 70, 60, 50, 40};
-        int n = 7;
-        struct Heap *H = CreatHeap(n);
-        for (int i = 0; i < n; i++) PushHeap(H, a[i]);
+        struct Node *solo = newNode(7);
+        assert(solo != NULL);
+        assert(solo->val == 7);
+        assert(solo->left == NULL);
+        assert(solo->right == NULL);
 
-        int prev = INT_MAX;
-        while (!IsEmptyHeap(H)) {
-            int v = PopHeap(H);
-            assert(v <= prev);
-            prev = v;
-        }
-        FreeHeap(H);
-    }
+        delete(&solo, 7);
+        assert(solo == NULL);
 
-    printf("\n===== 10. 交替 Push / Pop =====\n");
-    {
-        struct Heap *H = CreatHeap(10);
-        PushHeap(H, 5);
-        PushHeap(H, 3);
-        PushHeap(H, 8);
-
-        int v1 = PopHeap(H);
-        assert(v1 == 8);
-
-        PushHeap(H, 7);
-
-        int v2 = PopHeap(H);
-        assert(v2 == 7);
-
-        int v3 = PopHeap(H);
-        assert(v3 == 5);
-
-        int v4 = PopHeap(H);
-        assert(v4 == 3);
-
-        assert(IsEmptyHeap(H));
-        FreeHeap(H);
+        printf("  单节点删除后 solo == NULL ✅\n");
     }
 
     printf("\n===== ALL PASSED =====\n");
