@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <limits.h>
+
 
 struct Heap {
     int * data;
@@ -82,5 +84,9 @@ int findKthLargest(int* nums, int numsSize, int k) {
     for (int i = 0; i < k; i ++){
         maxk = PopHeap(head);
     }
+
+    free(head->data);
+    free(head);
+
     return maxk;
 }
